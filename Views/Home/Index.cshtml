@@ -1,0 +1,108 @@
+﻿@model ProductDisplayModel
+@{
+    
+}
+
+<!-- Carousel -->
+<div id="demo" class="carousel slide" data-bs-ride="carousel">
+
+    <!-- Indicators/dots -->
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+    </div>
+
+    <!-- The slideshow/carousel -->
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="~/Images/Screenshot1.png" alt="..." class="d-block w-100" style="height: 400px;">
+        </div>
+        <div class="carousel-item">
+            <img src="~/Images/Screenshot2.png" alt="..." class="d-block w-100" style="height: 400px;">
+        </div>
+        <div class="carousel-item">
+            <img src="~/Images/Screenshot3.png" alt="..." class="d-block w-100" style="height: 400px;">
+        </div>
+    </div>
+
+    <!-- Left and right controls/icons -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+
+<div class="my-2">
+    <form asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
+        <div class="col-12">
+            <label class="visually-hidden" for="categoryId">Category</label>
+            <select class="form-select" id="categoryId" name="categoryId">
+                <option selected>Category</option>
+                @foreach (var category in Model.Categories)
+                 {
+                    <option selected="@(category.CategoryId == Model.CategoryId)" value="@category.CategoryId">@category.CategoryName</option>
+                 }
+            </select>
+        </div>
+        <div class="col-12">
+            <label class="visually-hidden" for="sterm">Search by title</label>
+            <div class="input-group">
+                <div class="input-group-text"></div>
+                <input type="text" class="form-control" value="@Model.STerm" id="sterm" name="sterm" placeholder="Search by title">
+            </div>
+
+            <div class="col-8">
+                 <button type="submit" class="btn btn-primary">Search</button>
+                 <a href="/Home/Index" class="btn btn-dark">Reset</a>
+            </div>
+         </div>
+    </form>
+</div>
+
+<div class="w-100 d-flex flex-wrap">
+    @foreach(var product in Model.Products)
+    {
+        <div class="card mx-2 mb-4" style="width: 16rem;">
+            @if (string.IsNullOrEmpty(product.Image))
+            {
+                <img style="width:100%;height:180px" src="/Images/" class="card-img-top" alt="..." />
+            }
+            else
+            {
+                <img style="width:100%;height:180px" src="/Images/@product.Image" class="card-img-top" alt="..." />
+            }
+            <div class="card-body">
+                <h5 class="card-title">@product.ProductName</h5>
+                <p class="card-text">
+                    <b>Category: </b>@product.CategoryName<br />
+                    <b>Description: </b>@product.ProductDescription<br />
+                    <b>Rating: </b>@product.Rating<br />
+                    <b>Price: </b>@product.Price<br />
+                </p>                
+                <button type="button" onclick="add(@product.ProductId)" class="btn btn-primary">Add to cart</button>
+                <button type="button" href="https://localhost:7149/ProductItem/" class="btn btn-primary">View Item</button>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script>
+        async function add(productId) {
+            try {
+                  var responseCart = await fetch(`/Cart/AddItem?productId=${productId}`);
+                  if (responseCart.status == 200) {
+                  var resultCart = await responseCart.json();
+                  var cartCountEl = document.getElementById("cartCount");
+                  cartCountEl.innerHTML = resultCart;
+                  window.location.href = "#cartCount";
+                  }
+                } catch (err) {
+                console.log(err);
+            }
+        }
+    </script>
+}
